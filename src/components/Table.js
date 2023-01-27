@@ -23,23 +23,26 @@ const Table = () => {
     // options=['option1','option2','option3']
     // choice = options[Math.floor(Math.random()*options.length)]
 
-    function funChoice() {
+    function funChoice(field) {
       const choice = Math.random() * 3;
       if (choice <= 1) {
-        removeRandomAmount();
+        console.log(`Choice 1 remove`);
+        return removeRandomAmount(field, errorNum);
       } else if (choice <= 2) {
-        replaceRandomAmount();
+        console.log(`Choice 2 replace`);
+        return replaceRandomAmount(field, errorNum, locale);
       } else {
-        shuffleNearest();
+        console.log(`Choice 3 shuffle`);
+        return shuffleNearest(field, errorNum);
       }
     }
     return {
-      id: removeRandomAmount(faker.random.numeric(10), errorNum),
+      id: funChoice(faker.random.numeric(10)),
       name: faker.name.fullName(),
       address: faker.address.streetAddress(true),
       phone: faker.phone.number(),
     };
-  }, [errorNum]);
+  }, [errorNum, locale]);
 
   const generateUsers = useCallback(
     (length) => {
@@ -92,7 +95,7 @@ const Table = () => {
         // console.log(`Input updated by page ${page} func`);
       }
     },
-    [seedInput, generateUsers, page]
+    [seedInput, generateUsers]
   );
 
   const randomizeButtonHandler = useCallback(() => {

@@ -1,4 +1,11 @@
 import { faker } from "@faker-js/faker";
+import {
+  shuffleNearest,
+  replaceRandomAmount,
+  removeRandomAmount,
+  getRandomSymbol,
+} from "../utils/helpers";
+
 import React, { useCallback, useState, useEffect, useRef } from "react";
 // faker.setLocale('de')
 
@@ -7,28 +14,45 @@ const Table = () => {
   const [users, setUsers] = useState([]);
   const [seedInput, setSeedInput] = useState("");
   const [page, setPage] = useState(2);
+  const [errorNum, setErrorNum] = useState(0);
   const pageRef = useRef();
   const inputRef = useRef();
 
   // const [scrollTop, setScrollTop] = useState(0);
-  const createRandomUser = () => {
+  const createRandomUser = useCallback(() => {
+    // options=['option1','option2','option3']
+    // choice = options[Math.floor(Math.random()*options.length)]
+
+    function funChoice() {
+      const choice = Math.random() * 3;
+      if (choice <= 1) {
+        removeRandomAmount();
+      } else if (choice <= 2) {
+        replaceRandomAmount();
+      } else {
+        shuffleNearest();
+      }
+    }
     return {
-      id: faker.random.numeric(10),
+      id: removeRandomAmount(faker.random.numeric(10), errorNum),
       name: faker.name.fullName(),
       address: faker.address.streetAddress(true),
       phone: faker.phone.number(),
     };
-  };
+  }, [errorNum]);
 
-  const generateUsers = useCallback((length) => {
-    const usersNew = [];
+  const generateUsers = useCallback(
+    (length) => {
+      const usersNew = [];
 
-    Array.from({ length: length }).forEach(() => {
-      usersNew.push(createRandomUser());
-    });
-    setUsers((prevUsers) => [...prevUsers, ...usersNew]);
-    console.log(`+${length} users from gen.fun.`);
-  }, []);
+      Array.from({ length: length }).forEach(() => {
+        usersNew.push(createRandomUser());
+      });
+      setUsers((prevUsers) => [...prevUsers, ...usersNew]);
+      console.log(`+${length} users from gen.fun.`);
+    },
+    [createRandomUser]
+  );
 
   useEffect(() => {
     // console.log(`inputRef: ${inputRef.current.value}`);
@@ -38,8 +62,10 @@ const Table = () => {
       generateUsers(20);
     }
     if (page > 2) {
-      console.log(`> 2 triggered`);
-      const newEffSeed = faker.seed(+seedInput + page);
+      console.log(
+        `> 2 triggered,  inputRef ${inputRef.current.value}, pageRef ${pageRef.current.innerHTML} `
+      );
+      const newEffSeed = faker.seed(+inputRef.current.value + page);
       console.log(`Page ${page} updated seed to ${newEffSeed}`);
       const usersCount = 10 * page;
       setUsers([]);
@@ -49,7 +75,7 @@ const Table = () => {
     // if (page > 2) {
     //   faker.seed(seedInput);
     // }
-  }, [seedInput, generateUsers, page]);
+  }, [seedInput, generateUsers, page, errorNum, locale]);
 
   const handleScroll = useCallback(
     (e) => {
@@ -64,10 +90,9 @@ const Table = () => {
         generateUsers(10);
         // setSeedInput((prev) => prev + page);
         // console.log(`Input updated by page ${page} func`);
-        // setSeedInput(page);
       }
     },
-    [seedInput, generateUsers]
+    [seedInput, generateUsers, page]
   );
 
   const randomizeButtonHandler = useCallback(() => {
@@ -99,35 +124,75 @@ const Table = () => {
   }, []);
 
   return (
-    <div className="container text-center mw-50">
-      <select
-        onChange={changeLocaleHandler}
-        className="form-select m-3"
-        aria-label="Default select example"
-      >
-        <option defaultValue={locale}>Choose country</option>
-        <option value="en">EN-en</option>
-        <option value="de">GER-de</option>
-        <option value="fr">FR-fr</option>
-      </select>
-      <div className="input-group mb-3">
-        <button
-          onClick={randomizeButtonHandler}
-          className="btn btn-outline-secondary"
-          type="button"
-          id="button-addon1"
-        >
-          Randomize
-        </button>
-        <input
-          ref={inputRef}
-          type="number"
-          className="form-control"
-          onChange={onInputChangeHandler}
-          value={seedInput}
-          placeholder="Seed value"
-          aria-label="Example text with button addon"
-        />
+    <div className="container text-center mw-50 mt-3">
+      <div className="container">
+        <div className="row text-start">
+          <h1>Fake User Generator</h1>
+        </div>
+        <div className="row align-items-center ">
+          <div className="col">
+            <div className="input-group">
+              <button
+                onClick={randomizeButtonHandler}
+                className="btn btn-outline-secondary"
+                type="button"
+                id="button-addon1"
+              >
+                Randomize
+              </button>
+              <input
+                ref={inputRef}
+                type="text"
+                className="form-control"
+                onChange={onInputChangeHandler}
+                value={seedInput}
+                placeholder="Seed value"
+                aria-label="Seed input"
+              />
+            </div>
+          </div>
+          <div className="col">
+            <select
+              onChange={changeLocaleHandler}
+              className="form-select m-3"
+              aria-label="Default select example"
+            >
+              <option defaultValue={locale}>Choose country</option>
+              <option value="en">EN-en</option>
+              <option value="de">GER-de</option>
+              <option value="fr">FR-fr</option>
+            </select>
+          </div>
+          <div className="col ps-4">
+            <input
+              type="range"
+              className="form-range"
+              min="0"
+              max="10"
+              step="0.25"
+              id="error_range"
+              value={errorNum}
+              onChange={(e) => {
+                setErrorNum(+e.target.value);
+              }}
+            />
+          </div>
+          <div className="col-auto">
+            <input
+              id="errors"
+              placeholder="Set number of errors"
+              className="form-control"
+              type="number"
+              step="0.25"
+              min="0"
+              max="1000"
+              value={errorNum}
+              onChange={(e) => {
+                setErrorNum(+e.target.value);
+              }}
+            />
+          </div>
+        </div>
       </div>
       <div
         onScroll={handleScroll}

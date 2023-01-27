@@ -7,6 +7,7 @@ const Table = () => {
   const [users, setUsers] = useState([]);
   const [seedInput, setSeedInput] = useState("");
   const [page, setPage] = useState(2);
+  const pageRef = useRef();
   const inputRef = useRef();
 
   // const [scrollTop, setScrollTop] = useState(0);
@@ -30,11 +31,20 @@ const Table = () => {
   }, []);
 
   useEffect(() => {
-    console.log(`inputRef: ${inputRef.current.value}`);
+    // console.log(`inputRef: ${inputRef.current.value}`);
     if (seedInput !== "" && page <= 2) {
       setUsers([]);
       console.log(`Users cleaned`);
       generateUsers(20);
+    }
+    if (page > 2) {
+      console.log(`> 2 triggered`);
+      const newEffSeed = faker.seed(+seedInput + page);
+      console.log(`Page ${page} updated seed to ${newEffSeed}`);
+      const usersCount = 10 * page;
+      setUsers([]);
+      console.log(`Users cleaned`);
+      generateUsers(usersCount);
     }
     // if (page > 2) {
     //   faker.seed(seedInput);
@@ -49,26 +59,27 @@ const Table = () => {
           e.currentTarget.scrollHeight &&
         seedInput !== ""
       ) {
-        console.log("Bottom reached, generating users.");
+        setPage((prev) => prev + 1);
+        console.log(`Bottom reached, page +1`);
         generateUsers(10);
-        setPage((prev) => {
-          return prev + 1;
-        });
+        // setSeedInput((prev) => prev + page);
+        // console.log(`Input updated by page ${page} func`);
         // setSeedInput(page);
       }
     },
-    [generateUsers, seedInput]
+    [seedInput, generateUsers]
   );
 
   const randomizeButtonHandler = useCallback(() => {
-    setSeedInput(faker.seed());
-    console.log(`Randomize button triggered, seed randomized`);
+    const newSeed = faker.seed();
+    setSeedInput(newSeed);
+    console.log(`Randomize button triggered, seed is ${newSeed}`);
   }, []);
 
   const onInputChangeHandler = useCallback((e) => {
-    setSeedInput(+e.target.value);
-    faker.seed(+e.target.value);
-    console.log(`Input function triggered, seed updated to ${+e.target.value}`);
+    const newInputSeed = faker.seed(+e.target.value);
+    setSeedInput(newInputSeed);
+    console.log(`Input function triggered, seed updated to ${newInputSeed}`);
   }, []);
 
   const changeLocaleHandler = useCallback((e) => {
@@ -148,8 +159,8 @@ const Table = () => {
       <nav aria-label="...">
         <ul className="pagination mt-3">
           <li className="page-item">
-            <label htmlFor="">Page</label>
-            <span className="page-link" href="">
+            <label htmlFor="">Pages</label>
+            <span ref={pageRef} className="page-link" href="">
               {page}
             </span>
           </li>

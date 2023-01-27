@@ -1,15 +1,15 @@
 import { faker } from "@faker-js/faker";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 // faker.setLocale('de')
 
 const Table = () => {
   const [locale, setLocale] = useState("en");
   const [users, setUsers] = useState([]);
-  // const [seed, setSeed] = useState(0);
   const [seedInput, setSeedInput] = useState("");
-  const [page, setPage] = useState(1);
-  // const [scrollTop, setScrollTop] = useState(0);
+  const [page, setPage] = useState(2);
+  const inputRef = useRef();
 
+  // const [scrollTop, setScrollTop] = useState(0);
   const createRandomUser = () => {
     return {
       id: faker.random.numeric(10),
@@ -26,39 +26,52 @@ const Table = () => {
       usersNew.push(createRandomUser());
     });
     setUsers((prevUsers) => [...prevUsers, ...usersNew]);
+    console.log(`+${length} users from gen.fun.`);
   }, []);
 
-  const handleScroll = (e) => {
-    // setScrollTop(e.currentTarget.scrollTop);
-    // console.log("scrollHeight - " + e.currentTarget.scrollHeight);
-    // console.log("clientHeight - " + e.currentTarget.clientHeight);
-    // console.log("scrollTop - " + e.currentTarget.scrollTop);
-    if (
-      Math.ceil(e.currentTarget.scrollTop) + e.currentTarget.clientHeight ===
-      e.currentTarget.scrollHeight
-    ) {
-      console.log("Bottom reached!");
-      generateUsers(10);
-      setPage((prevPage) => prevPage + 0.5);
-    }
-  };
-
   useEffect(() => {
-    if (seedInput !== "") {
+    console.log(`inputRef: ${inputRef.current.value}`);
+    if (seedInput !== "" && page <= 2) {
       setUsers([]);
+      console.log(`Users cleaned`);
       generateUsers(20);
-      console.log(`Effect ran inside if block`);
     }
-    console.log(`Effect ran`);
-  }, [seedInput, generateUsers]);
+    // if (page > 2) {
+    //   faker.seed(seedInput);
+    // }
+  }, [seedInput, generateUsers, page]);
 
-  //7913120977915957 - Israel Weber
-  //7257761553160407 - Ethel Beier
-  function randomizeButtonHandler() {
+  const handleScroll = useCallback(
+    (e) => {
+      // setScrollTop(e.currentTarget.scrollTop);
+      if (
+        Math.ceil(e.currentTarget.scrollTop) + e.currentTarget.clientHeight ===
+          e.currentTarget.scrollHeight &&
+        seedInput !== ""
+      ) {
+        console.log("Bottom reached, generating users.");
+        generateUsers(10);
+        setPage((prev) => {
+          return prev + 1;
+        });
+        // setSeedInput(page);
+      }
+    },
+    [generateUsers, seedInput]
+  );
+
+  const randomizeButtonHandler = useCallback(() => {
     setSeedInput(faker.seed());
-  }
+    console.log(`Randomize button triggered, seed randomized`);
+  }, []);
 
-  function changeLocaleHandler(e) {
+  const onInputChangeHandler = useCallback((e) => {
+    setSeedInput(+e.target.value);
+    faker.seed(+e.target.value);
+    console.log(`Input function triggered, seed updated to ${+e.target.value}`);
+  }, []);
+
+  const changeLocaleHandler = useCallback((e) => {
     const locale = e.target.value;
     switch (locale) {
       case "fr":
@@ -71,10 +84,8 @@ const Table = () => {
         faker.locale = "en";
         break;
     }
-
     setLocale(locale);
-    console.log(locale);
-  }
+  }, []);
 
   return (
     <div className="container text-center mw-50">
@@ -98,12 +109,10 @@ const Table = () => {
           Randomize
         </button>
         <input
+          ref={inputRef}
           type="number"
           className="form-control"
-          onChange={(e) => {
-            setSeedInput(+e.target.value);
-            faker.seed(+e.target.value);
-          }}
+          onChange={onInputChangeHandler}
           value={seedInput}
           placeholder="Seed value"
           aria-label="Example text with button addon"
@@ -140,7 +149,7 @@ const Table = () => {
         <ul className="pagination mt-3">
           <li className="page-item">
             <label htmlFor="">Page</label>
-            <span class="page-link" href="">
+            <span className="page-link" href="">
               {page}
             </span>
           </li>

@@ -144,7 +144,7 @@ const Table = () => {
           <h1>Fake User Generator</h1>
         </div>
         <div className="row align-items-center ">
-          <div className="col">
+          <div className="col-lg">
             <div className="input-group">
               <button
                 onClick={randomizeButtonHandler}
@@ -168,7 +168,7 @@ const Table = () => {
           <div className="col">
             <select
               onChange={changeLocaleHandler}
-              className="form-select m-3"
+              className="form-select my-3"
               aria-label="Country"
             >
               <option defaultValue={locale}>Choose country</option>
@@ -248,8 +248,25 @@ const Table = () => {
               {page}
             </span>
           </li>
+          <li className="container-sm align-self-center">
+            <CSVLink
+              headers={[
+                { label: "ID", key: "id" },
+                { label: "Full Name", key: "name" },
+                { label: "Address", key: "address" },
+                { label: "Phone", key: "phone" },
+              ]}
+              data={users}
+              filename={"random-users.csv"}
+            >
+              <button type="button" class="btn btn-secondary">
+                Export Users to CSV
+              </button>
+            </CSVLink>
+          </li>
         </ul>
       </nav>
+
       {/* <h2>Scroll Top: {scrollTop}</h2> */}
     </div>
   );

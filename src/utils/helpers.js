@@ -3,7 +3,8 @@ const gerLetters =
 const engLetters =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const frLetters =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÈÉÊËÎÏÔŒÙÜabcdefghijklmnopqrstuvwxyzàâæçèéêëîïôœûü0123456789";
+// const numbers = "0123456789";
 
 // 2nd version
 export function removeRandomAmount(str, amount) {
@@ -12,9 +13,9 @@ export function removeRandomAmount(str, amount) {
   if (!Number.isInteger(amount)) {
     const chance = amount - Math.floor(amount);
     if (chance >= Math.random()) {
-      console.log(`${chance} is success!`);
+      // console.log(`${chance} is success!`);
       amountChanced = Math.ceil(amount);
-      console.log(`upgraded to ${amountChanced}`);
+      // console.log(`upgraded to ${amountChanced}`);
     }
     // 1.25 1.5 1.75
   }
@@ -32,9 +33,9 @@ export function replaceRandomAmount(str, amount, locale) {
   if (!Number.isInteger(amount)) {
     const chance = amount - Math.floor(amount);
     if (chance >= Math.random()) {
-      console.log(`${chance} is success!`);
+      // console.log(`${chance} is success!`);
       amountChanced = Math.ceil(amount);
-      console.log(`upgraded to ${amountChanced}`);
+      // console.log(`upgraded to ${amountChanced}`);
     }
   }
   for (let i = 0; i < amountChanced; i++) {
@@ -49,10 +50,13 @@ export function getRandomSymbol(locale) {
   let letters;
   if (locale === "de") {
     letters = gerLetters;
-  } else {
+  }
+  if (locale === "fr") {
+    letters = frLetters;
+  }
+  if (locale === "en") {
     letters = engLetters;
   }
-
   const pos = Math.floor(Math.random() * letters.length);
   return letters.charAt(pos);
 }

@@ -3,11 +3,9 @@ import {
   shuffleNearest,
   replaceRandomAmount,
   removeRandomAmount,
-  getRandomSymbol,
 } from "../utils/helpers";
-
+import { CSVLink } from "react-csv";
 import React, { useCallback, useState, useEffect, useRef } from "react";
-// faker.setLocale('de')
 
 const Table = () => {
   const [locale, setLocale] = useState("en");
@@ -22,25 +20,38 @@ const Table = () => {
   const createRandomUser = useCallback(() => {
     // options=['option1','option2','option3']
     // choice = options[Math.floor(Math.random()*options.length)]
-
-    function funChoice(field) {
+    function funcChoice(field) {
       const choice = Math.random() * 3;
       if (choice <= 1) {
-        console.log(`Choice 1 remove`);
+        // console.log(`Choice 1 remove`);
         return removeRandomAmount(field, errorNum);
       } else if (choice <= 2) {
-        console.log(`Choice 2 replace`);
+        // console.log(`Choice 2 replace`);
         return replaceRandomAmount(field, errorNum, locale);
       } else {
-        console.log(`Choice 3 shuffle`);
+        // console.log(`Choice 3 shuffle`);
         return shuffleNearest(field, errorNum);
       }
     }
+    function genAddress() {
+      let address;
+      const choice = Math.random() * 3;
+      if (choice <= 1) {
+        address = `${faker.address.streetAddress(
+          true
+        )}, ${faker.address.cityName()}`;
+      } else if (choice <= 2) {
+        address = `${faker.address.cityName()}, ${faker.address.street()}, ${faker.address.buildingNumber()}, ${faker.address.zipCode()}`;
+      } else {
+        address = `${faker.address.buildingNumber()}, ${faker.address.street()}, ${faker.address.city()}, ${faker.address.zipCode()}`;
+      }
+      return address;
+    }
     return {
-      id: funChoice(faker.random.numeric(10)),
-      name: faker.name.fullName(),
-      address: faker.address.streetAddress(true),
-      phone: faker.phone.number(),
+      id: faker.random.numeric(10),
+      name: funcChoice(faker.name.fullName()),
+      address: funcChoice(genAddress()),
+      phone: funcChoice(faker.phone.number()),
     };
   }, [errorNum, locale]);
 
@@ -158,12 +169,12 @@ const Table = () => {
             <select
               onChange={changeLocaleHandler}
               className="form-select m-3"
-              aria-label="Default select example"
+              aria-label="Country"
             >
               <option defaultValue={locale}>Choose country</option>
-              <option value="en">EN-en</option>
-              <option value="de">GER-de</option>
-              <option value="fr">FR-fr</option>
+              <option value="en">America</option>
+              <option value="de">Germany</option>
+              <option value="fr">France</option>
             </select>
           </div>
           <div className="col ps-4">
@@ -228,7 +239,12 @@ const Table = () => {
         <ul className="pagination mt-3">
           <li className="page-item">
             <label htmlFor="">Pages</label>
-            <span ref={pageRef} className="page-link" href="">
+            <span
+              style={{ color: "black" }}
+              ref={pageRef}
+              className="page-link"
+              href=""
+            >
               {page}
             </span>
           </li>

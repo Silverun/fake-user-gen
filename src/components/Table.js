@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { shuffleNearest, replaceRandom, removeRandom } from "../utils/helpers";
+import { shuffleNearest, addRandom, removeRandom } from "../utils/helpers";
 import { CSVLink } from "react-csv";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 
@@ -55,7 +55,7 @@ const Table = () => {
         return removeRandom(field);
       } else if (choice <= 2) {
         // console.log(`Choice 2 replace`);
-        return replaceRandom(field, locale);
+        return addRandom(field, locale);
       } else {
         // console.log(`Choice 3 shuffle`);
         return shuffleNearest(field);
@@ -105,6 +105,7 @@ const Table = () => {
     [createRandomUser]
   );
 
+  //  ----------------------------- !!!!!!!!!!!!!!------------------
   useEffect(() => {
     // console.log(`inputRef: ${inputRef.current.value}`);
     if (seedInput !== "" && page <= 2) {

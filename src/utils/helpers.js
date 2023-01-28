@@ -4,56 +4,15 @@ const engLetters =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const frLetters =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÈÉÊËÎÏÔŒÙÜabcdefghijklmnopqrstuvwxyzàâæçèéêëîïôœûü0123456789";
-// const numbers = "0123456789";
 
-// 2nd version
-// export function removeRandomAmount(str, amount) {
-//   let amountChanced = amount;
-
-//   if (!Number.isInteger(amount)) {
-//     const chance = amount - Math.floor(amount);
-//     if (chance >= Math.random()) {
-//       // console.log(`${chance} is success!`);
-//       amountChanced = Math.ceil(amount);
-//       // console.log(`upgraded to ${amountChanced}`);
-//     }
-//     // 1.25 1.5 1.75
-//   }
-//   for (let i = 0; i < amountChanced; i++) {
-//     const max = str.length - 1;
-//     const pos = Math.round(Math.random() * max);
-//     str = str.slice(0, pos) + str.slice(pos + 1);
-//   }
-//   return str;
-// }
 export function removeRandom(str) {
   const max = str.length - 1;
   const pos = Math.round(Math.random() * max);
   str = str.slice(0, pos) + str.slice(pos + 1);
   return str;
 }
-// husk 4
 
-// export function replaceRandomAmount(str, amount, locale) {
-//   let amountChanced = amount;
-
-//   if (!Number.isInteger(amount)) {
-//     const chance = amount - Math.floor(amount);
-//     if (chance >= Math.random()) {
-//       // console.log(`${chance} is success!`);
-//       amountChanced = Math.ceil(amount);
-//       // console.log(`upgraded to ${amountChanced}`);
-//     }
-//   }
-//   for (let i = 0; i < amountChanced; i++) {
-//     const pos = Math.floor(Math.random() * str.length);
-//     str =
-//       str.substring(0, pos) + getRandomSymbol(locale) + str.substring(pos + 1);
-//   }
-//   return str;
-// }
-
-export function replaceRandom(str, locale) {
+export function addRandom(str, locale) {
   const pos = Math.floor(Math.random() * str.length);
   str =
     str.substring(0, pos) +
@@ -78,7 +37,6 @@ export function getRandomSymbol(locale) {
   return letters.charAt(pos);
 }
 
-// WORKING
 export function shuffleNearest(str) {
   let arr = str.split("");
   const randPos = Math.floor(Math.random() * arr.length);
@@ -89,7 +47,3 @@ export function shuffleNearest(str) {
   const newStr = arr.join("");
   return newStr;
 }
-
-// Arrays
-
-// arr[Math.floor(Math.random() * arr.length)] = randomLetter();

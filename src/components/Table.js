@@ -1,9 +1,5 @@
 import { faker } from "@faker-js/faker";
-import {
-  shuffleNearest,
-  replaceRandomAmount,
-  removeRandomAmount,
-} from "../utils/helpers";
+import { shuffleNearest, replaceRandom, removeRandom } from "../utils/helpers";
 import { CSVLink } from "react-csv";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 
@@ -18,21 +14,66 @@ const Table = () => {
 
   // const [scrollTop, setScrollTop] = useState(0);
   const createRandomUser = useCallback(() => {
-    // options=['option1','option2','option3']
-    // choice = options[Math.floor(Math.random()*options.length)]
+    const randomUser = {
+      id: faker.random.numeric(10),
+      name: faker.name.fullName(),
+      address: genAddress(),
+      phone: faker.phone.number(),
+    };
+
+    let errorsChanced = errorNum;
+
+    if (!Number.isInteger(errorNum)) {
+      const chance = errorNum - Math.floor(errorNum);
+      if (chance >= Math.random()) {
+        // console.log(`${chance} is success!`);
+        errorsChanced = Math.ceil(errorNum);
+        // console.log(`upgraded to ${amountChanced}`);
+      }
+    }
+
+    for (let i = 0; i < errorsChanced; i++) {
+      // console.log(fieldChoice());
+      // console.log(funcChoice(`hello`));
+      const field = fieldChoice();
+      if (field[1] === "name") {
+        randomUser.name = funcChoice(field[0]);
+      }
+      if (field[1] === "address") {
+        randomUser.address = funcChoice(field[0]);
+      }
+      if (field[1] === "phone") {
+        randomUser.phone = funcChoice(field[0]);
+      }
+    }
+
     function funcChoice(field) {
+      // console.log(`funcChoice fun ran`);
       const choice = Math.random() * 3;
       if (choice <= 1) {
         // console.log(`Choice 1 remove`);
-        return removeRandomAmount(field, errorNum);
+        return removeRandom(field);
       } else if (choice <= 2) {
         // console.log(`Choice 2 replace`);
-        return replaceRandomAmount(field, errorNum, locale);
+        return replaceRandom(field, locale);
       } else {
         // console.log(`Choice 3 shuffle`);
-        return shuffleNearest(field, errorNum);
+        return shuffleNearest(field);
       }
     }
+
+    function fieldChoice() {
+      const choice = Math.random() * 3;
+      // console.log(`Field choice fun ran`);
+      if (choice <= 1) {
+        return [randomUser.name, "name"];
+      } else if (choice <= 2) {
+        return [randomUser.address, "address"];
+      } else {
+        return [randomUser.phone, "phone"];
+      }
+    }
+
     function genAddress() {
       let address;
       const choice = Math.random() * 3;
@@ -47,12 +88,8 @@ const Table = () => {
       }
       return address;
     }
-    return {
-      id: faker.random.numeric(10),
-      name: funcChoice(faker.name.fullName()),
-      address: funcChoice(genAddress()),
-      phone: funcChoice(faker.phone.number()),
-    };
+
+    return randomUser;
   }, [errorNum, locale]);
 
   const generateUsers = useCallback(
@@ -71,6 +108,7 @@ const Table = () => {
   useEffect(() => {
     // console.log(`inputRef: ${inputRef.current.value}`);
     if (seedInput !== "" && page <= 2) {
+      // We can pass in clean users and generate errors here
       setUsers([]);
       console.log(`Users cleaned`);
       generateUsers(20);
@@ -259,7 +297,7 @@ const Table = () => {
               data={users}
               filename={"random-users.csv"}
             >
-              <button type="button" class="btn btn-secondary">
+              <button type="button" className="btn btn-secondary">
                 Export Users to CSV
               </button>
             </CSVLink>

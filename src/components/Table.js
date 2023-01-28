@@ -289,12 +289,20 @@ const Table = () => {
           <li className="container-sm align-self-center">
             <CSVLink
               headers={[
+                { label: "Number", key: "num" },
                 { label: "ID", key: "id" },
                 { label: "Full Name", key: "name" },
                 { label: "Address", key: "address" },
                 { label: "Phone", key: "phone" },
               ]}
-              data={users}
+              data={(() => {
+                const csvData = users;
+
+                csvData.forEach((user, i, arr) => {
+                  user.num = i + 1;
+                });
+                return csvData;
+              })()}
               filename={"random-users.csv"}
             >
               <button type="button" className="btn btn-secondary">

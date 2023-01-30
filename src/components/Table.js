@@ -9,10 +9,8 @@ const Table = () => {
   const [seedInput, setSeedInput] = useState("");
   const [page, setPage] = useState(2);
   const [errorNum, setErrorNum] = useState(0);
-  const pageRef = useRef();
   const inputRef = useRef();
 
-  // const [scrollTop, setScrollTop] = useState(0);
   const createRandomUser = useCallback(() => {
     const randomUser = {
       id: faker.random.numeric(10),
@@ -20,21 +18,14 @@ const Table = () => {
       address: genAddress(),
       phone: faker.phone.number(),
     };
-
     let errorsChanced = errorNum;
-
     if (!Number.isInteger(errorNum)) {
       const chance = errorNum - Math.floor(errorNum);
       if (chance >= Math.random()) {
-        // console.log(`${chance} is success!`);
         errorsChanced = Math.ceil(errorNum);
-        // console.log(`upgraded to ${amountChanced}`);
       }
     }
-
     for (let i = 0; i < errorsChanced; i++) {
-      // console.log(fieldChoice());
-      // console.log(funcChoice(`hello`));
       const field = fieldChoice();
       if (field[1] === "name") {
         randomUser.name = funcChoice(field[0]);
@@ -48,23 +39,18 @@ const Table = () => {
     }
 
     function funcChoice(field) {
-      // console.log(`funcChoice fun ran`);
       const choice = Math.random() * 3;
       if (choice <= 1) {
-        // console.log(`Choice 1 remove`);
         return removeRandom(field);
       } else if (choice <= 2) {
-        // console.log(`Choice 2 replace`);
         return addRandom(field, locale);
       } else {
-        // console.log(`Choice 3 shuffle`);
         return shuffleNearest(field);
       }
     }
 
     function fieldChoice() {
       const choice = Math.random() * 3;
-      // console.log(`Field choice fun ran`);
       if (choice <= 1) {
         return [randomUser.name, "name"];
       } else if (choice <= 2) {
@@ -88,14 +74,12 @@ const Table = () => {
       }
       return address;
     }
-
     return randomUser;
   }, [errorNum, locale]);
 
   const generateUsers = useCallback(
     (length) => {
       const usersNew = [];
-
       Array.from({ length: length }).forEach(() => {
         usersNew.push(createRandomUser());
       });
@@ -105,44 +89,28 @@ const Table = () => {
     [createRandomUser]
   );
 
-  //  ----------------------------- !!!!!!!!!!!!!!------------------
   useEffect(() => {
-    // console.log(`inputRef: ${inputRef.current.value}`);
     if (seedInput !== "" && page <= 2) {
-      // We can pass in clean users and generate errors here
       setUsers([]);
-      console.log(`Users cleaned`);
       generateUsers(20);
     }
     if (page > 2) {
-      console.log(
-        `> 2 triggered,  inputRef ${inputRef.current.value}, pageRef ${pageRef.current.innerHTML} `
-      );
-      const newEffSeed = faker.seed(+inputRef.current.value + page);
-      console.log(`Page ${page} updated seed to ${newEffSeed}`);
+      faker.seed(+inputRef.current.value + page);
       const usersCount = 10 * page;
       setUsers([]);
-      console.log(`Users cleaned`);
       generateUsers(usersCount);
     }
-    // if (page > 2) {
-    //   faker.seed(seedInput);
-    // }
   }, [seedInput, generateUsers, page, errorNum, locale]);
 
   const handleScroll = useCallback(
     (e) => {
-      // setScrollTop(e.currentTarget.scrollTop);
       if (
         Math.ceil(e.currentTarget.scrollTop) + e.currentTarget.clientHeight ===
           e.currentTarget.scrollHeight &&
         seedInput !== ""
       ) {
         setPage((prev) => prev + 1);
-        console.log(`Bottom reached, page +1`);
         generateUsers(10);
-        // setSeedInput((prev) => prev + page);
-        // console.log(`Input updated by page ${page} func`);
       }
     },
     [seedInput, generateUsers]
@@ -151,13 +119,11 @@ const Table = () => {
   const randomizeButtonHandler = useCallback(() => {
     const newSeed = faker.seed();
     setSeedInput(newSeed);
-    console.log(`Randomize button triggered, seed is ${newSeed}`);
   }, []);
 
   const onInputChangeHandler = useCallback((e) => {
     const newInputSeed = faker.seed(+e.target.value);
     setSeedInput(newInputSeed);
-    console.log(`Input function triggered, seed updated to ${newInputSeed}`);
   }, []);
 
   const changeLocaleHandler = useCallback((e) => {
@@ -276,17 +242,6 @@ const Table = () => {
       </div>
       <nav aria-label="...">
         <ul className="pagination mt-3">
-          <li className="page-item">
-            <label htmlFor="">Pages</label>
-            <span
-              style={{ color: "black" }}
-              ref={pageRef}
-              className="page-link"
-              href=""
-            >
-              {page}
-            </span>
-          </li>
           <li className="container-sm align-self-center">
             <CSVLink
               headers={[
@@ -313,8 +268,6 @@ const Table = () => {
           </li>
         </ul>
       </nav>
-
-      {/* <h2>Scroll Top: {scrollTop}</h2> */}
     </div>
   );
 };
